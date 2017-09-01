@@ -11,6 +11,8 @@ const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 
+const PHASER_DIR = path.join(__dirname, '../node_modules/phaser-ce');
+
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
 const publicPath = '/';
@@ -32,27 +34,27 @@ module.exports = {
   // This means they will be the "root" imports that are included in JS bundle.
   // The first two entry points enable "hot" CSS and auto-refreshes for JS.
   entry: [
-    // Include an alternative client for WebpackDevServer. A client's job is to
-    // connect to WebpackDevServer by a socket and get notified about changes.
-    // When you save a file, the client will either apply hot updates (in case
-    // of CSS changes), or refresh the page (in case of JS changes). When you
-    // make a syntax error, this client will display a syntax error overlay.
-    // Note: instead of the default WebpackDevServer client, we use a custom one
-    // to bring better experience for Create React App users. You can replace
-    // the line below with these two lines if you prefer the stock client:
-    // require.resolve('webpack-dev-server/client') + '?/',
-    // require.resolve('webpack/hot/dev-server'),
-    require.resolve('react-dev-utils/webpackHotDevClient'),
-    // We ship a few polyfills by default:
-    require.resolve('./polyfills'),
-    // Errors should be considered fatal in development
-    require.resolve('react-error-overlay'),
-    // Finally, this is your app's code:
-    paths.appIndexJs,
-    // We include the app code last so that if there is a runtime error during
-    // initialization, it doesn't blow up the WebpackDevServer client, and
-    // changing JS code would still trigger a refresh.
-  ],
+      // Include an alternative client for WebpackDevServer. A client's job is to
+      // connect to WebpackDevServer by a socket and get notified about changes.
+      // When you save a file, the client will either apply hot updates (in case
+      // of CSS changes), or refresh the page (in case of JS changes). When you
+      // make a syntax error, this client will display a syntax error overlay.
+      // Note: instead of the default WebpackDevServer client, we use a custom one
+      // to bring better experience for Create React App users. You can replace
+      // the line below with these two lines if you prefer the stock client:
+      // require.resolve('webpack-dev-server/client') + '?/',
+      // require.resolve('webpack/hot/dev-server'),
+      require.resolve('react-dev-utils/webpackHotDevClient'),
+      // We ship a few polyfills by default:
+      require.resolve('./polyfills'),
+      // Errors should be considered fatal in development
+      require.resolve('react-error-overlay'),
+      // Finally, this is your app's code:
+      paths.appIndexJs,
+      // We include the app code last so that if there is a runtime error during
+      // initialization, it doesn't blow up the WebpackDevServer client, and
+      // changing JS code would still trigger a refresh.
+    ],
   output: {
     // Next line is not used in dev but WebpackDevServer crashes without it:
     path: paths.appBuild,
@@ -97,10 +99,13 @@ module.exports = {
       '.jsx',
     ],
     alias: {
-      
+
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
+      pixi: path.join(PHASER_DIR, 'build/custom/pixi.js'),
+      p2: path.join(PHASER_DIR, 'build/custom/p2.js'),
+      'phaser-ce': path.join(PHASER_DIR, 'build/custom/phaser-split.js')
     },
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).
@@ -131,6 +136,32 @@ module.exports = {
         loader: require.resolve('source-map-loader'),
         enforce: 'pre',
         include: paths.appSrc,
+        exclude: [
+          /pixi\.js/,
+          /phaser-split\.js$/,
+          /p2\.js/,
+        ]
+      },
+      {
+        test: /pixi\.js/,
+        use: [{
+          loader: 'expose-loader',
+          options: 'PIXI',
+        }],
+      },
+      {
+        test: /phaser-split\.js$/,
+        use: [{
+          loader: 'expose-loader',
+          options: 'Phaser',
+        }],
+      },
+      {
+        test: /p2\.js/,
+        use: [{
+          loader: 'expose-loader',
+          options: 'p2',
+        }],
       },
       // ** ADDING/UPDATING LOADERS **
       // The "file" loader handles all assets unless explicitly excluded.
@@ -233,8 +264,6 @@ module.exports = {
       inject: true,
       template: paths.appHtml,
     }),
-    // Add module names to factory functions so they appear in browser profiler.
-    new webpack.NamedModulesPlugin(),
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'development') { ... }. See `./env.js`.
     new webpack.DefinePlugin(env.stringified),
