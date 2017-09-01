@@ -19,11 +19,14 @@
     "file-loader": "0.11.2",
     "fs-extra": "3.0.1",
     "html-webpack-plugin": "2.28.0",
+    "husky": "^0.14.3",
     "jest": "20.0.3",
+    "lint-staged": "^4.0.4",
     "object-assign": "4.1.1",
     "phaser-ce": "^2.8.5",
     "postcss-flexbugs-fixes": "3.0.0",
     "postcss-loader": "2.0.5",
+    "prettier": "^1.6.1",
     "promise": "7.1.1",
     "react": "^15.6.1",
     "react-dev-utils": "^3.0.1",
@@ -45,9 +48,17 @@
     "whatwg-fetch": "2.0.3"
   },
   "scripts": {
+    "precommit": "lint-staged"
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom"
+    "test": "node scripts/test.js --env=jsdom",
+    "prettier": "prettier --single-quote --write '{config,src,scripts}/**/*.js'"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --single-quote --write '{config,src,scripts}/**/*.js'",
+      "git add"
+    ]
   },
   "jest": {
     "mapCoverage": true,
