@@ -1,18 +1,15 @@
 import * as Phaser from 'phaser-ce';
+import CheckersStage from './stage/Checkers';
 
-class Game {
-  game: Phaser.Game;
-
+class Game extends Phaser.Game {
   constructor(canvas: HTMLElement) {
-    this.game = new Phaser.Game(800, 600, Phaser.AUTO, canvas, {
-      create: this.create
-    });
+    super(640, 640, Phaser.AUTO, canvas);
+    this.state.add('Checkers', CheckersStage, false);
   }
 
-  create() {
-    const text = 'Hello World!';
-    const style = { font: '65px Arial', fill: '#ff0000', align: 'center' };
-    this.game.add.text(0, 0, text, style);
+  boot() {
+    super.boot();
+    this.stage.setBackgroundColor('#57463d');
   }
 }
 

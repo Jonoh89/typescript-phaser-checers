@@ -6,14 +6,15 @@ class GameCanvas extends React.Component {
 
   componentDidMount() {
     if (this.c) {
-      new Game(this.c);
+      const game = new Game(this.c);
+      game.state.start('Checkers');
     } else {
       throw new Error('No element available');
     }
   }
 
   render() {
-    return <div ref={c => (this.c = c)} />;
+    return <div className="gameCanvas" ref={c => (this.c = c)} />;
   }
 }
 
